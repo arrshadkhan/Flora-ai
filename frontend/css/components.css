@@ -1,0 +1,43 @@
+.icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.flip { transform: scaleY(-1); }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-secondary);
+}
+.icon-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.icon-btn[aria-pressed="true"], .icon-btn.copied { color: var(--accent-color); }
+.icon-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+
+.btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 12px; font-weight: 500;
+  border: 1px solid var(--border-color); border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+}
+.btn:hover { border-color: var(--accent-color); background: var(--accent-soft); }
+
+.select {
+  padding: 6px 10px; font-weight: 500;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  background: transparent;
+}
+.select:hover { background: var(--bg-secondary); }
+.select option { background: var(--bg-elevated); color: var(--text-primary); }
+
+.attachment-chip {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  padding: 3px 6px 3px 10px; font-size: 0.8rem;
+  background: var(--accent-soft); border-radius: 999px;
+}
+.attachment-chip button { border: 0; background: none; font-size: 1.1rem; line-height: 1; color: var(--text-secondary); }
+
+@media (max-width: 768px) {
+  .icon-btn { width: 44px; height: 44px; }
+  .btn { min-height: 44px; }
+}

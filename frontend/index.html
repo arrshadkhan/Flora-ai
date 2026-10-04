@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flora AI</title>
+  <link rel="icon" href="assets/logo/flora.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/chat.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <svg hidden aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2l-1 6a2 2 0 0 1-2 2H7"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <div class="sidebar-top">
+        <a class="brand" href="./" aria-label="Flora AI home">
+          <img src="assets/logo/flora.svg" alt="" width="28" height="28">
+          <span>Flora AI</span>
+        </a>
+        <button class="icon-btn" id="collapse-btn" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">
+          <svg class="icon" aria-hidden="true"><use href="#i-panel"/></svg>
+        </button>
+      </div>
+
+      <button class="btn" id="new-chat" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> New chat
+      </button>
+
+      <div class="search">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="search" id="chat-search" placeholder="Search chats" aria-label="Search chats" autocomplete="off">
+      </div>
+
+      <nav class="conv-nav" aria-label="Recent conversations">
+        <h2 class="section-label">Recent</h2>
+        <ul id="conv-list"></ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="profile">
+          <span class="profile-avatar" aria-hidden="true">G</span>
+          <span class="profile-name">Guest user</span>
+        </div>
+        <button class="icon-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg>
+        </button>
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme" title="Toggle theme">
+          <svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>
+        </button>
+      </div>
+    </aside>
+    <div class="backdrop" id="backdrop"></div>
+
+    <main class="chat">
+      <header class="topbar">
+        <button class="icon-btn open-sidebar" id="open-sidebar" type="button" aria-label="Open sidebar" title="Open sidebar">
+          <svg class="icon" aria-hidden="true"><use href="#i-panel"/></svg>
+        </button>
+        <label class="sr-only" for="model-select">Model</label>
+        <select class="select" id="model-select">
+          <option value="flora-1">Flora 1</option>
+          <option value="flora-1-mini">Flora 1 Mini</option>
+          <option value="flora-1-pro">Flora 1 Pro</option>
+        </select>
+      </header>
+
+      <section class="messages" id="messages" aria-label="Conversation">
+        <div class="empty-state" id="empty-state">
+          <img src="assets/logo/flora.svg" alt="" width="56" height="56">
+          <h1>Flora AI</h1>
+          <p>How can I help you today?</p>
+          <div class="suggestions">
+            <button type="button" class="suggestion" data-prompt="Explain how neural networks learn, in simple terms."><strong>Explain a concept</strong><span>Break down a hard idea</span></button>
+            <button type="button" class="suggestion" data-prompt="Help me write a Python function that removes duplicates from a list."><strong>Help me code</strong><span>Write, debug or review code</span></button>
+            <button type="button" class="suggestion" data-prompt="Help me analyze a document. What should I look for when summarizing it?"><strong>Analyze a document</strong><span>Summarize and extract key points</span></button>
+            <button type="button" class="suggestion" data-prompt="Brainstorm five ideas for a final-year software engineering project."><strong>Brainstorm an idea</strong><span>Explore options together</span></button>
+          </div>
+        </div>
+        <div class="thread" id="thread" role="log"></div>
+      </section>
+
+      <footer class="composer-wrap">
+        <form class="composer" id="composer" data-state="idle">
+          <div class="attachment-chip" id="attachment-chip" hidden>
+            <span></span>
+            <button type="button" id="remove-attachment" aria-label="Remove attachment">&times;</button>
+          </div>
+          <textarea id="prompt" rows="1" placeholder="Message Flora AI" aria-label="Message Flora AI"></textarea>
+          <div class="composer-row">
+            <input type="file" id="file-input" hidden>
+            <button type="button" class="icon-btn" id="attach-btn" aria-label="Attach a file" title="Attach a file">
+              <svg class="icon" aria-hidden="true"><use href="#i-clip"/></svg>
+            </button>
+            <span class="spacer"></span>
+            <button type="button" class="icon-btn" id="voice-btn" aria-label="Voice input (coming soon)" title="Voice input (coming soon)" aria-disabled="true">
+              <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>
+            </button>
+            <button type="submit" class="send-btn" id="send-btn" aria-label="Send message" title="Send" disabled>
+              <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg>
+            </button>
+            <button type="button" class="send-btn" id="stop-btn" aria-label="Stop generating" title="Stop generating">
+              <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg>
+            </button>
+          </div>
+        </form>
+        <p class="disclaimer">Flora AI can make mistakes. Check important information.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
