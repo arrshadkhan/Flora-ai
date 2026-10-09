@@ -1,4 +1,7 @@
 .venv/
+.venv_flora/
 __pycache__/
-*.pyc
-.streamlit/secrets.toml
+*.py[cod]
+.env
+.env.*
+!.env.example

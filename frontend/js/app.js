@@ -15,8 +15,15 @@ const sidebar = initSidebar({
 initTheme(document.getElementById("theme-toggle"));
 
 async function init() {
-  state.conversations = await api.getConversations();
-  sidebar.setConversations(state.conversations);
+  try {
+    const health = await api.healthCheck();
+    console.log('FastAPI connection:',health);
+
+    state.conversations = await api.getConversations();
+    sidebar.setConversations(state.conversations);
+  }catch(error){
+    console.error('Backend connection failed:',error);
+  }
 }
 
 function stopGeneration() {

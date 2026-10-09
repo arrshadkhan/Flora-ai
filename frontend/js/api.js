@@ -1,6 +1,6 @@
 // Single place for all backend communication. Flip USE_MOCK to false once FastAPI is running.
 const API_BASE_URL = "http://localhost:8000";
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 async function request(path, { method = "GET", body, signal } = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -73,6 +73,7 @@ const mock = {
 };
 
 /* ---------- Public API ---------- */
+export const healthCheck = () => request("/health");
 export const getConversations = () => (USE_MOCK ? mock.list() : request("/conversations"));
 export const getConversation = (id) => (USE_MOCK ? mock.get(id) : request(`/conversations/${id}`));
 export const createConversation = (title) =>
@@ -83,5 +84,5 @@ export const renameConversation = (id, title) =>
   USE_MOCK ? mock.rename(id, title) : request(`/conversations/${id}`, { method: "PATCH", body: { title } });
 export const sendMessage = ({ conversationId, messages, model, signal }) =>
   USE_MOCK
-    ? mock.send({ conversationId, messages, signal })
-    : request(`/conversations/${conversationId}/messages`, { method: "POST", body: { messages, model }, signal });
+? mock.send({ conversationId, messages, signal })
+: request(`/conversations/${conversationId}/messages`, { method: "POST", body: { messages, model }, signal });
