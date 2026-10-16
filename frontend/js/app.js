@@ -76,28 +76,56 @@ function regenerate() {
 }
 
 async function generate() {
-  const history = state.messages; // captured so a mid-flight chat switch can't corrupt the new chat
+  // Keep a reference to the current conversation history.
+  const history = state.messages;
   const handle = chat.addAssistantMessage();
   const controller = new AbortController();
   state.controller = controller;
   chat.setState("loading");
-
+  let receivedFirstChunk = false;
   try {
     const { content } = await api.sendMessage({
       conversationId: state.activeId,
       messages: history,
       model: document.getElementById("model-select").value,
       signal: controller.signal,
+
+      onChunk: (chunk) => {
+        if (!receivedFirstChunk) {
+          receivedFirstChunk = true;
+          chat.setState("generating");
+        }
+
+        handle.appendChunk(chunk);
+      },
     });
-    chat.setState("generating");
-    const shown = await chat.streamText(handle, content, controller.signal);
-    if (shown) history.push({ role: "assistant", content: shown });
+    // Save the complete assistant response.
+    if (content) {
+      history.push({
+        role: "assistant",
+        content: content,
+      });
+    }
     handle.finish();
   } catch (error) {
-    if (error.name === "AbortError") handle.finish();
-    else handle.fail("Flora AI couldn't reach the server. Check your connection and try again.");
+    if (error.name === "AbortError") {
+      handle.finish();
+    } else {
+      console.error("Flora streaming error:", error);
+
+      const message =
+        error instanceof TypeError
+          ? "Flora couldn't reach the backend. Check that FastAPI is running."
+          : error.message ||
+            "Flora couldn't generate a response. Please try again.";
+
+      handle.fail(message);
+    }
   } finally {
-    if (state.controller === controller) state.controller = null;
+    if (state.controller === controller) {
+      state.controller = null;
+    }
+
     chat.setState("idle");
   }
 }

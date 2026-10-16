@@ -133,30 +133,58 @@ export function initChat({ onSubmit, onStop, onRegenerate }) {
     return el;
   }
 
-  function addAssistantMessage() {
-    const el = createAssistantElement();
-    const body = el.querySelector(".markdown");
-    const typing = el.querySelector(".typing");
-    scrollToBottom(true);
-    return {
-      setContent(text) {
-        typing.remove();
-        el.raw = text;
-        const unclosedFence = (text.match(/```/g) || []).length % 2;
-        body.innerHTML = renderMarkdown(unclosedFence ? `${text}\n\`\`\`` : text);
-      },
-      finish() {
-        typing.remove();
-        if (!el.raw) return el.remove();
-        el.querySelector(".msg-actions").hidden = false;
-      },
-      fail(message) {
-        typing.remove();
-        body.innerHTML = '<p class="error-text" role="alert"></p>';
-        body.firstChild.textContent = message;
-      },
-    };
+  
+function addAssistantMessage() {
+  const el = createAssistantElement();
+  const body = el.querySelector(".markdown");
+  const typing = el.querySelector(".typing");
+  scrollToBottom(true);
+  // Render the text received so far.
+  function renderContent(text) {
+    if (typing.isConnected) {
+      typing.remove();
+    }
+    el.raw = text;
+    // Close unfinished Markdown code fences while streaming.
+    const unclosedFence =
+      (text.match(/```/g) || []).length % 2;
+    body.innerHTML = renderMarkdown(
+      unclosedFence ? `${text}\n\`\`\`` : text
+    );
+    scrollToBottom();
   }
+  return {
+    // Set an entire response.
+    setContent(text) {
+      renderContent(text);
+    },
+    // Append a newly received streaming chunk.
+    appendChunk(chunk) {
+      renderContent(el.raw + chunk);
+    },
+    finish() {
+      if (typing.isConnected) {
+        typing.remove();
+      }
+
+      if (!el.raw) {
+        el.remove();
+        return;
+      }
+      el.querySelector(".msg-actions").hidden = false;
+    },
+    fail(message) {
+      if (typing.isConnected) {
+        typing.remove();
+      }
+      body.innerHTML =
+        '<p class="error-text" role="alert"></p>';
+
+      body.firstChild.textContent = message;
+    },
+  };
+}
+
 
   function addUserMessage(text) {
     const el = document.createElement("article");
